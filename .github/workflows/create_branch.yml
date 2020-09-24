@@ -1,0 +1,26 @@
+name: Create Branch for Issues
+
+on:
+  issues:
+    types:
+      - assigned
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        architecture: 'x64'
+    - name: Install Dependencies
+      run: pip install PyGithub awesome-slugify
+    - name: Exec Python Issue Assign
+      env: 
+          milestone: ${{ github.event.issue.milestone.title }} 
+          issue: ${{ github.event.issue.title }}
+          issue_num: ${{ github.event.issue.number }}
+          repository: ${{ github.repository }}
+      run: python util/workflows/create_branch.py ${{ secrets.GITHUB_TOKEN }}
